@@ -22,7 +22,7 @@ def getChamp(opggUrl):
 
 
 topChamp = getChamp(opggUrl)
-rate = getWinRate('https://na.op.gg/champion/statistics')
+rate = getWinRate(opggUrl)
 
-print(getWinRate(opggUrl))
-print(getChamp(opggUrl))
+print(rate)
+print(topChamp)
