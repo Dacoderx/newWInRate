@@ -1,28 +1,22 @@
-import bs4
-import requests
+from selenium import webdriver
+from selenium.webdriver import ChromeOptions
+import pandas as pd
+import csv
 
-opggUrl = 'https://na.op.gg/statistics/champion/'
+options = ChromeOptions()
+options.add_argument('--headless')
 
+driver = webdriver.Chrome(options=options)
+driver.implicitly_wait(3)
+driver.get('https://na.op.gg/statistics/champion/')
 
-def getWinRate(opggUrl):
-    res = requests.get(opggUrl)
-    res.raise_for_status()
-
-    soupRate = bs4.BeautifulSoup(res.content, 'html.parser')
-    elemRate = soupRate.find_all('#ChampionStatsTable > table > tbody > tr:nth-child(1) > td:nth-child(4) > span')
-    return elemRate
-
-
-def getChamp(opggUrl):
-    resTop = requests.get(opggUrl)
-    resTop.raise_for_status()
-    soupChamp = bs4.BeautifulSoup(resTop.content, 'html.parser')
-    elemChamp = soupChamp.find_all('#ChampionStatsTable > table > tbody > tr:nth-child(1) > td.Cell.ChampionName > a')
-    return elemChamp
-
-
-topChamp = getChamp(opggUrl)
-rate = getWinRate(opggUrl)
-
-print(rate)
-print(topChamp)
+rows = driver.find_elements_by_xpath('//*[@id="ChampionStatsTable"]//tr[./td]')
+data = []
+for row in rows:
+    name = row.find_element_by_xpath('./td[@class="Cell ChampionName"]').text
+    win_rate = row.find_element_by_xpath('./td[@class="Cell ChampionName"]/following-sibling::td[1]').text
+    print(name + ': ' + win_rate)
+    #data.append({'Champion':name, 'Winrate': win_rate})
+#df = pd.DataFrame(data)
+#print(df)
+#df.to_csv('championWinRate.csv')
